@@ -121,7 +121,8 @@ async function testScooterResult() {
           document.querySelector('div.Track_OrderInfo__2fpDL').innerText);
         result = result.slice(result.indexOf('метро')+6,result.indexOf('Телефон')-1);
         console.log('Метро в данных заказа: '+ result);
-
+        
+        await page.waitForTimeout(600);
         // у отображаемых станций в коде присудствует атрибут style. его наличие как раз и проверем следующей функцией
         const elemOnDisplay = await page.$eval("span.Track_Circle__3rizg",
                 element=> !!element.getAttribute("style")) // !! позвоеляет получить булевое значение
