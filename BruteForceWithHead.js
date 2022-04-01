@@ -131,7 +131,7 @@ async function testScooterResult() {
         } else {
             console.log("Станция метро "+ nameOfStation +" не отображается");
             await page.screenshot({path: `Итерация-${i}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`}); // если станция не отображается делаем скриншот
-            notDisplayed.push(nameOfStation); // дополнительно пишем в массив станции которые не отобразились 
+            await notDisplayed.push(nameOfStation); // дополнительно пишем в массив станции которые не отобразились 
         }
         // условием выхода из цикла являяется проверка последней станции
         if (nameOfStation == 'Лихоборы') {
