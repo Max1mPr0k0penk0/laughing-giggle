@@ -92,7 +92,7 @@ async function testScooterResult() {
         const yesButton = await page.$x('//*[@id="root"]/div/div[2]/div[5]/div[2]/button[2]');
         await yesButton[0].click();
 
-        await page.waitForTimeout(600); // ждем секунду подгрузки поп-апа "Заказ оформлен"
+        await page.waitForTimeout(600); // ждем подгрузку поп-апа "Заказ оформлен"
 
         let orderNumber = await page.evaluate(() => 
             document.querySelector('div.Order_Text__2broi').innerText); //возвращает первый элемент, соответствующий данному CSS-селектору и тут же получаем текстовое содержимое
