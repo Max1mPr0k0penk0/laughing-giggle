@@ -41,7 +41,7 @@ async function testScooterResult() {
         console.log('Выбор станции метро');
         const metroField = await page.$('input.select-search__input'); // находим поле со станциями метро и кликаем по нему, чтобы раскрыть выпадающий список со станциями
         await metroField.click();
-        await page.waitForTimeout(800); // ожидаем подгрузки выпадающего списка
+        await page.waitForTimeout(1000); // ожидаем подгрузки выпадающего списка
         const nextMetroField = await page.$x('//*[@id="root"]/div/div[2]/div[2]/div[4]/div/div[2]/ul/li['+i+']/button'); //тут хитрость. Чтобы корректно выбрать станцию, мы обращаемся к ней через xpath локатор. в каждом последующем локаторе атрибут "value" увеличивается на 1, ровно как переменная-счетчик!
         await nextMetroField[0].click(); // кликаем на станцию
 
@@ -92,7 +92,7 @@ async function testScooterResult() {
         const yesButton = await page.$x('//*[@id="root"]/div/div[2]/div[5]/div[2]/button[2]');
         await yesButton[0].click();
 
-        await page.waitForTimeout(1000); // ждем секунду подгрузки поп-апа "Заказ оформлен"
+        await page.waitForTimeout(600); // ждем секунду подгрузки поп-апа "Заказ оформлен"
 
         let orderNumber = await page.evaluate(() => 
             document.querySelector('div.Order_Text__2broi').innerText); //возвращает первый элемент, соответствующий данному CSS-селектору и тут же получаем текстовое содержимое
