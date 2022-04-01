@@ -127,8 +127,6 @@ async function testScooterResult() {
                 element=> !!element.getAttribute("style")) // !! позвоеляет получить булевое значение
         if (elemOnDisplay) { 
             console.log('Станция метро '+ nameOfStation +' отображается');
-            await page.screenshot({path: `Отображается-${i}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`})
-
         } else {
             console.log("Станция метро "+ nameOfStation +" не отображается");
             await page.screenshot({path: `Итерация-${i}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`}); // если станция не отображается делаем скриншот
