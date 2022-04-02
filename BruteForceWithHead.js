@@ -47,7 +47,7 @@ async function testScooterResult() {
         }
         await page.keyboard.press('Enter');
         
-        // тут следует сложный момент, который я подглядел на stackowerflow. page.$$ возвращает все элементы по селектору в массиве. Массив мы перебираем в цикле и достаем значение атрибута value
+        // тут следует сложный момент, который я подглядел на stackowerflow и переделал под этот кейс. page.$$ возвращает все элементы по селектору в массиве. Массив мы перебираем в цикле и достаем значение атрибута value, в нем записано название выбранной станции
         let nameOfStation = [];
         const inputElements = await page.$$('input.select-search__input');
         for (element of inputElements) {  
