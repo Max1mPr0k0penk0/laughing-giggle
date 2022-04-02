@@ -115,7 +115,7 @@ async function testScooterResult() {
         await statusButton[0].click();
 
         // ждем появления данных заказа
-        await page.waitForTimeout(600);
+        await page.waitForTimeout(400);
 
         // получаем название отображаемой станции также как и номер заказа
         let result = await page.evaluate(() => 
