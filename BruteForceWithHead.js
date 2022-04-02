@@ -8,7 +8,7 @@ const URL_TEST = 'https://f4949b01-fc82-4d9d-869b-a7863de77965.serverhub.praktik
 
 async function testScooterResult() {
     console.log('Запуск браузера');
-    const browser = await puppeteer.launch({headless: false, slowMo: 0, args: ['--window-size=1920,1080'], defaultViewport: null}); // запускаем браузер с флагом разрешения 1920x1080, параметр slowMo влияет на скорость прохождения теста
+    const browser = await puppeteer.launch({headless: false, slowMo: 0, args: ['--window-size=1920,1080'], defaultViewport: null}); // запускаем браузер с флагом разрешения 1920x1080 и областью просмотра под это разрешение, параметр slowMo влияет на скорость прохождения теста
 
     console.log('Создание новой вкладки в браузере');
     const page = await browser.newPage();
@@ -17,9 +17,9 @@ async function testScooterResult() {
 
     console.log('Переход по ссылке');
     await page.goto(URL_TEST);
-
+    
     for (let i = 1; true; i++) {
-        console.log('Итерация '+ i);
+        console.log(`Проверка ${i}/237`);
         console.log('Клик в кнопку "Заказать".');
         const orderButton = await page.$('.Button_Button__ra12g');
         await orderButton.click(); // открываем экран "Для кого самокат"
@@ -62,11 +62,11 @@ async function testScooterResult() {
         console.log('Выбрана станция: ' + nameOfStation);
 
         console.log('Заполнение поля Номер');
-        const numberField = await page.$('input[placeholder="* Телефон: на него позвонит курьер"]');
-        await numberField.type('89999999999');
+        const numberField = await page.$x('//*[@id="root"]/div/div[2]/div[2]/div[5]/input'); // обращаемся к элементу через xpath локатор
+        await numberField[0].type('+79999999999');
 
         console.log('Клик в кнопку "Далее"');
-        const nextButton = await page.$x('//*[@id="root"]/div/div[2]/div[3]/button'); // обращаемся к элементу через xpath локатор
+        const nextButton = await page.$x('//*[@id="root"]/div/div[2]/div[3]/button');
         await nextButton[0].click();
 
         console.log('Клик в поле даты');
@@ -115,7 +115,7 @@ async function testScooterResult() {
         await statusButton[0].click();
 
         // ждем появления данных заказа
-        await page.waitForTimeout(400);
+        await page.waitForSelector('div.Track_OrderInfo__2fpDL');
 
         // получаем название отображаемой станции также как и номер заказа
         let result = await page.evaluate(() => 
@@ -126,8 +126,10 @@ async function testScooterResult() {
         // у отображаемых станций в коде присудствует атрибут style. его наличие как раз и проверем следующей функцией
         const elemOnDisplay = await page.$eval("span.Track_Circle__3rizg",
                 element=> !!element.getAttribute("style")) // !! позвоеляет получить булевое значение
-        if (elemOnDisplay) { 
+        if (elemOnDisplay && nameOfStation == result) { 
             console.log('Станция метро '+ nameOfStation +' отображается');
+        } else if (elemOnDisplay && nameOfStation != result) {
+            console.log(`Вместо ${nameOfStation} отобразилась ${result}`);
         } else {
             console.log("Станция метро "+ nameOfStation +" не отображается");
             await page.screenshot({path: `Итерация-${i}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`}); // если станция не отображается делаем скриншот
