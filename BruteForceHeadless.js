@@ -100,10 +100,10 @@ async function testScooterResult() {
             i -= 1;
             const statusButton = await page.$x('//*[@id="root"]/div/div[2]/div[5]/div[2]/button');
             await statusButton[0].click();
-            console.log('Номер не вывелся!')
+            console.log('Номер не вывелся!');
             continue;
         } else {
-            console.log("Номер заказа: "+ orderNumber)
+            console.log("Номер заказа: "+ orderNumber);
         }  
 
         // переход на экран Стутс заказа
@@ -122,7 +122,7 @@ async function testScooterResult() {
         await page.waitForTimeout(600);
         // у отображаемых станций в коде присудствует атрибут style. его наличие как раз и проверем следующей функцией
         const elemOnDisplay = await page.$eval("span.Track_Circle__3rizg",
-                element=> !!element.getAttribute("style")) // !! позвоеляет получить булевое значение
+                element=> !!element.getAttribute("style")); // !! позвоеляет получить булевое значение
          if (elemOnDisplay && nameOfStation == result) { 
             console.log('Станция метро '+ nameOfStation +' отображается');
         } else if (elemOnDisplay && nameOfStation != result) {
