@@ -96,10 +96,11 @@ async function testScooterResult() {
         await page.waitForTimeout(1000); // ждем секунду подгрузки поп-апа "Заказ оформлен"
 
         let orderNumber = await page.evaluate(() => 
-            document.querySelector('div.Order_Text__2broi').innerText); //возвращает первый элемент, соответствующий данному CSS-селектору и тут же получаем текстовое содержимое
-        orderNumber = orderNumber.slice(orderNumber.indexOf(':')+2,orderNumber.indexOf('.')); // отсекаем через строковые методы лишнюю информацию (лучше не придумал)
-        // инода номер заказа не успевает отобразится. На этот случай существует костыль проверяющий, что длина номера заказа больше 1 символа. Если номер не вывелся, мы прогоняем итерацию повторно
-        if (orderNumber.length == 0) {
+            document.querySelector('div.Order_Text__2broi').innerText.match(/[0-9]+/g)); //возвращает первый элемент, соответствующий данному CSS-селектору, потом с помощью .innerText получаем текстовое содержимое, тут же применяем к нему строковый метод .match 
+        // который выполняет посик по строке с использование регулярного выражения(то что в скобках). регулярка заключается в слеши// выражение [0-9] говорит, что будем искать цифры + говорит, что символ может быть повторен более одного раза, а флаг g говорит, что поиск следует вести по всей строке
+        // если соответстиве не будет найдено, метод вернет null
+        // инода номер заказа не успевает отобразится. На этот случай существует костыль проверяющий, что длина в переменной не null. Если номер не вывелся, мы прогоняем итерацию повторно
+        if (orderNumber === null) {
             i -= 1;
             const statusButton = await page.$x('//*[@id="root"]/div/div[2]/div[5]/div[2]/button');
             await statusButton[0].click();
@@ -117,7 +118,7 @@ async function testScooterResult() {
         // ждем появления данных заказа
         await page.waitForSelector('div.Track_OrderInfo__2fpDL');
 
-        // получаем название отображаемой станции также как и номер заказа
+        // а тут получаем название станции через срезы строк. Вот он- shitcode
         let result = await page.evaluate(() => 
           document.querySelector('div.Track_OrderInfo__2fpDL').innerText);
         result = result.slice(result.indexOf('метро')+6,result.indexOf('Телефон')-1);
