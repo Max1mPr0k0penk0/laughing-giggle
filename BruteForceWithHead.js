@@ -19,7 +19,7 @@ async function testScooterResult() {
     await page.goto(URL_TEST);
     
     for (let i = 1; true; i++) {
-        console.log(`Проверка ${i}/237`);
+        console.log(`Проверка ${i}/225`);
         console.log('Клик в кнопку "Заказать".');
         const orderButton = await page.$('.Button_Button__ra12g');
         await orderButton.click(); // открываем экран "Для кого самокат"
