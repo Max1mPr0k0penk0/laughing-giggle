@@ -41,7 +41,7 @@ async function testScooterResult() {
         console.log('Выбор станции метро');
         const metroField = await page.$('input.select-search__input'); // находим поле со станциями метро и кликаем по нему, чтобы раскрыть выпадающий список со станциями
         await metroField.click();
-        await page.waitForTimeout(1000); // ожидаем подгрузки выпадающего списка
+        await page.waitForXPath('//*[@id="root"]/div/div[2]/div[2]/div[4]/div/div[2]/ul/li['+i+']/button'); // ожидаем подгрузки выпадающего списка
         const nextMetroField = await page.$x('//*[@id="root"]/div/div[2]/div[2]/div[4]/div/div[2]/ul/li['+i+']/button'); //тут хитрость. Чтобы корректно выбрать станцию, мы обращаемся к ней через xpath локатор. в каждом последующем локаторе атрибут "value" увеличивается на 1, ровно как переменная-счетчик!
         await nextMetroField[0].click(); // кликаем на станцию
 
@@ -51,10 +51,8 @@ async function testScooterResult() {
 
         for (element of inputElements) {
                 let inputValue;
-
                 inputValue = await element.getProperty('value');
                 inputValue = await inputValue.jsonValue();
-
             nameOfStation.push(inputValue);
         }
         nameOfStation = String(nameOfStation);
@@ -62,7 +60,7 @@ async function testScooterResult() {
 
         console.log('Заполнение поля Номер');
         const numberField = await page.$('input[placeholder="* Телефон: на него позвонит курьер"]');
-        await numberField.type('89999999999');
+        await numberField.type('+79999999999');
 
         console.log('Клик в кнопку "Далее"');
         const nextButton = await page.$x('//*[@id="root"]/div/div[2]/div[3]/button'); // обращаемся к элементу через xpath локатор
@@ -97,7 +95,7 @@ async function testScooterResult() {
         let orderNumber = await page.evaluate(() => 
             document.querySelector('div.Order_Text__2broi').innerText); //возвращает первый элемент, соответствующий данному CSS-селектору и тут же получаем текстовое содержимое
         orderNumber = orderNumber.slice(orderNumber.indexOf(':')+2,orderNumber.indexOf('.')); // отсекаем через строковые методы лишнюю информацию (лучше не придумал)
-        // инода номер заказа не успевает отобразится. На этот случай существует костыль проверяющий, что длина номера заказа равна 0. Если номер не вывелся, мы прогоняем итерацию повторно
+        // иногда номер заказа не успевает отобразиться. На этот случай существует костыль проверяющий, что длина номера заказа равна 0. Если номер не вывелся, мы прогоняем итерацию повторно
         if (orderNumber.length == 0) {
             i -= 1;
             const statusButton = await page.$x('//*[@id="root"]/div/div[2]/div[5]/div[2]/button');
@@ -120,14 +118,15 @@ async function testScooterResult() {
         let result = await page.evaluate(() => 
           document.querySelector('div.Track_OrderInfo__2fpDL').innerText);
         result = result.slice(result.indexOf('метро')+6,result.indexOf('Телефон')-1);
-        console.log('Метро в данных заказа: '+ result);
         
         await page.waitForTimeout(600);
         // у отображаемых станций в коде присудствует атрибут style. его наличие как раз и проверем следующей функцией
         const elemOnDisplay = await page.$eval("span.Track_Circle__3rizg",
                 element=> !!element.getAttribute("style")) // !! позвоеляет получить булевое значение
-        if (elemOnDisplay) { 
+         if (elemOnDisplay && nameOfStation == result) { 
             console.log('Станция метро '+ nameOfStation +' отображается');
+        } else if (elemOnDisplay && nameOfStation != result) {
+            console.log(`Вместо ${nameOfStation} отобразилась ${result}`);
         } else {
             console.log("Станция метро "+ nameOfStation +" не отображается");
             await page.screenshot({path: `Итерация-${i}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`}); // если станция не отображается делаем скриншот
