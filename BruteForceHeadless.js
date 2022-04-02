@@ -45,7 +45,7 @@ async function testScooterResult() {
         const nextMetroField = await page.$x('//*[@id="root"]/div/div[2]/div[2]/div[4]/div/div[2]/ul/li['+i+']/button'); //тут хитрость. Чтобы корректно выбрать станцию, мы обращаемся к ней через xpath локатор. в каждом последующем локаторе атрибут "value" увеличивается на 1, ровно как переменная-счетчик!
         await nextMetroField[0].click(); // кликаем на станцию
 
-        // тут следует сложный момент, который я подглядел на stackowerflow. Как я понимаю, page.$$ возвращает все элементы по селектору в массиве. Массив мы перебираем в цикле и достаем значение атрибута value
+        // тут следует сложный момент, который я подглядел на stackowerflow. page.$$ возвращает все элементы по селектору в массиве. Массив мы перебираем в цикле и достаем значение атрибута value
         let nameOfStation = []; 
         const inputElements = await page.$$('input.select-search__input');
 
