@@ -47,9 +47,9 @@ async function testScooterResult() {
         }
         await page.keyboard.press('Enter');
         
-        // тут следует сложный момент, который я подглядел на stackowerflow. Как я понимаю, мы получаем все элементы удовлетворяющие классу, перебераем в цикле и достаем значение атрибута value
+        // тут следует сложный момент, который я подглядел на stackowerflow. page.$$ возвращает все элементы по селектору в массиве. Массив мы перебираем в цикле и достаем значение атрибута value
         let nameOfStation = [];
-        const inputElements = await page.$$('input.select-search__input'); // возвращает все элементы внутри (), удовлетворяющие данному CSS-селектору
+        const inputElements = await page.$$('input.select-search__input');
         for (element of inputElements) {  
                 let inputValue;
 
