@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 // !Данный скрипт перебирает все станции метро и проверяет их отображение на экране "Статус заказа". По понятным причинам он работает медленнее чем безголовая версия
 
-let notDisplayed = [] // сюда запишутся станции которые не отобразились
+let notDisplayed = []; // сюда запишутся станции которые не отобразились
 
 const URL_TEST = 'https://f4949b01-fc82-4d9d-869b-a7863de77965.serverhub.praktikum-services.ru/'; // сюда вставляем URL сервера
 
@@ -103,10 +103,10 @@ async function testScooterResult() {
             i -= 1;
             const statusButton = await page.$x('//*[@id="root"]/div/div[2]/div[5]/div[2]/button');
             await statusButton[0].click();
-            console.log('Номер не вывелся!')
+            console.log('Номер не вывелся!');
             continue;
         } else {
-            console.log("Номер заказа: "+ orderNumber)
+            console.log("Номер заказа: "+ orderNumber);
         }  
 
         // переход на экран Стутс заказа
