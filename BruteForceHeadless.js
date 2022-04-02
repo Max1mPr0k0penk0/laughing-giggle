@@ -114,7 +114,7 @@ async function testScooterResult() {
         await statusButton[0].click();
 
         // ждем появления данных заказа
-        await page.waitForSelector('span.Track_Circle__3rizg'); 
+        await page.waitForTimeout(600);
 
         // получаем название отображаемой станции также как и номер заказа
         let result = await page.evaluate(() => 
@@ -122,7 +122,6 @@ async function testScooterResult() {
         result = result.slice(result.indexOf('метро')+6,result.indexOf('Телефон')-1);
         console.log('Метро в данных заказа: '+ result);
         
-        await page.waitForTimeout(600);
         // у отображаемых станций в коде присудствует атрибут style. его наличие как раз и проверем следующей функцией
         const elemOnDisplay = await page.$eval("span.Track_Circle__3rizg",
                 element=> !!element.getAttribute("style")) // !! позвоеляет получить булевое значение
