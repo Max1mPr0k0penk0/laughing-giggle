@@ -116,7 +116,8 @@ async function testScooterResult() {
         await statusButton[0].click();
 
         // ждем появления данных заказа
-        await page.waitForTimeout(700);
+                await page.waitForSelector('div.Track_OrderInfo__2fpDL');
+
 
         // а тут получаем название станции через срезы строк. Вот он- shitcode
         let result = await page.evaluate(() => 
@@ -124,6 +125,7 @@ async function testScooterResult() {
         result = result.slice(result.indexOf('метро')+6,result.indexOf('Телефон')-1);
         console.log('Метро в данных заказа: '+ result);
         
+        await page.waitForTimeout(700);
         // у отображаемых станций в коде присудствует атрибут style. его наличие как раз и проверем следующей функцией
         const elemOnDisplay = await page.$eval("span.Track_Circle__3rizg",
                 element=> !!element.getAttribute("style")) // !! позвоеляет получить булевое значение
