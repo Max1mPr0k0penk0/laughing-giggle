@@ -116,7 +116,7 @@ async function testScooterResult() {
         await statusButton[0].click();
 
         // ждем появления данных заказа
-        await page.waitForSelector('div.Track_OrderInfo__2fpDL');
+        await page.waitForTimeout(700);
 
         // а тут получаем название станции через срезы строк. Вот он- shitcode
         let result = await page.evaluate(() => 
