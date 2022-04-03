@@ -41,7 +41,7 @@ async function testScooterResult() {
         console.log('Выбор станции метро');
         const metroField = await page.$('input.select-search__input'); // находим поле со станциями метро и кликаем по нему, чтобы раскрыть выпадающий список со станциями
         await metroField.click();
-        await page.waitForTimeout(600); // ожидаем подгрузки выпадающего списка
+        await page.waitForTimeout(700); // ожидаем подгрузки выпадающего списка
         for (let z = 1; z <= i; z++) {
             await page.keyboard.press('ArrowDown'); // в цикле прокручиваем выпадающий список путем нажатия кнопки "Вниз"
         }
