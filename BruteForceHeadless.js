@@ -31,8 +31,8 @@ async function testScooterResult() {
         await nameField.type('Максим');
 
         console.log('Заполнение поля Фамилия');
-        const secondNameField = await page.$('input[placeholder="* Фамилия"]'); 
-        await secondNameField.type('Прокопенко');
+        const surnameField = await page.$('input[placeholder="* Фамилия"]'); 
+        await surnameField.type('Прокопенко');
 
         console.log('Заполнение поля Адрес');
         const adressField = await page.$('input[placeholder="* Адрес: куда привезти заказ"]');
