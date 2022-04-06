@@ -18,8 +18,16 @@ async function testScooterResult() {
     console.log('Переход по ссылке');
     await page.goto(URL_TEST);
     
-    for (let i = 1; true; i++) {
-        console.log(`Проверка ${i}/225`);
+    // проверяем открыто ли окно с кукамии. Если да- закрываем т.к. при различных разрешениях экрана оно мешает
+    let cookie = await page.evaluate(() => 
+        !!document.querySelector('div.App_CookieConsent__1yUIN'));
+    if (cookie) {
+        const orderButton = await page.$x('//*[@id="rcc-confirm-button"]');
+        await orderButton[0].click(); // закрываем окно с кукками
+    }
+    
+    for (let i = 0; true; i++) {
+        console.log(`Проверка ${i+1}/225`);
         console.log('Клик в кнопку "Заказать".');
         const orderButton = await page.$('.Button_Button__ra12g');
         await orderButton.click(); // открываем экран "Для кого самокат"
@@ -41,11 +49,15 @@ async function testScooterResult() {
         console.log('Выбор станции метро');
         const metroField = await page.$('input.select-search__input'); // находим поле со станциями метро и кликаем по нему, чтобы раскрыть выпадающий список со станциями
         await metroField.click();
-        await page.waitForTimeout(700); // ожидаем подгрузки выпадающего списка
-        for (let z = 1; z <= i; z++) {
+        await page.waitForTimeout(500); // ожидаем подгрузки выпадающего списка
+        for (let z = 1; z <= i+1; z++) {
             await page.keyboard.press('ArrowDown'); // в цикле прокручиваем выпадающий список путем нажатия кнопки "Вниз"
         }
-        await page.keyboard.press('Enter');
+        await page.waitForTimeout(500);
+        // проверка на последнюю станцию. Если в DOM нет следующего элемента(станции метро), мы получаем false, что и является выходом из цикла
+        let scriptBreaker = await page.evaluate((i) => 
+            !!document.querySelector(`li.select-search__row[data-index="${i+1}"]`), i);
+        await page.keyboard.press('Enter'); // выбор станции
         
         // тут следует сложный момент, который я подглядел на stackowerflow и переделал под этот кейс. page.$$ возвращает все элементы по селектору в массиве. Массив мы перебираем в цикле и достаем значение атрибута value, в нем записано название выбранной станции
         let nameOfStation = [];
@@ -62,8 +74,8 @@ async function testScooterResult() {
         console.log('Выбрана станция: ' + nameOfStation);
 
         console.log('Заполнение поля Номер');
-        const numberField = await page.$x('//*[@id="root"]/div/div[2]/div[2]/div[5]/input'); // обращаемся к элементу через xpath локатор
-        await numberField[0].type('+79999999999');
+        const numberField = await page.$('input[placeholder="* Телефон: на него позвонит курьер"]');
+        await numberField.type('+79999999999');
 
         console.log('Клик в кнопку "Далее"');
         const nextButton = await page.$x('//*[@id="root"]/div/div[2]/div[3]/button');
@@ -135,11 +147,11 @@ async function testScooterResult() {
             console.log(`Вместо ${nameOfStation} отобразилась ${result}`);
         } else {
             console.log("Станция метро "+ nameOfStation +" не отображается");
-            await page.screenshot({path: `Итерация-${i}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`}); // если станция не отображается делаем скриншот
+            await page.screenshot({path: `Итерация-${i+1}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`}); // если станция не отображается делаем скриншот
             await notDisplayed.push(nameOfStation); // дополнительно пишем в массив станции которые не отобразились 
         }
         // условием выхода из цикла являяется проверка последней станции
-        if (nameOfStation == 'Лихоборы') {
+        if (!scriptBreaker) {
             break;
         }
     }
