@@ -17,9 +17,17 @@ async function testScooterResult() {
 
     console.log('Переход по ссылке');
     await page.goto(URL_TEST);
+    
+    // проверяем открыто ли окно с кукамии. Если да- закрываем т.к. при различных разрешениях экрана оно мешает
+    let cookie = await page.evaluate(() => 
+        !!document.querySelector('div.App_CookieConsent__1yUIN'));
+    if (cookie) {
+        const orderButton = await page.$x('//*[@id="rcc-confirm-button"]');
+        await orderButton[0].click(); // закрываем окно с кукками
+    }
 
-    for (let i = 1; true; i++) {
-        console.log(`Проверка ${i}/225`);
+    for (let i = 0; true; i++) {
+        console.log(`Проверка ${i+1}/225`);
         console.log('Клик в кнопку "Заказать".');
         const orderButton = await page.$('.Button_Button__ra12g');
         await orderButton.click(); // открываем экран "Для кого самокат"
@@ -41,9 +49,12 @@ async function testScooterResult() {
         console.log('Выбор станции метро');
         const metroField = await page.$('input.select-search__input'); // находим поле со станциями метро и кликаем по нему, чтобы раскрыть выпадающий список со станциями
         await metroField.click();
-        await page.waitForXPath('//*[@id="root"]/div/div[2]/div[2]/div[4]/div/div[2]/ul/li['+i+']'); // ожидаем подгрузки выпадающего списка
-        const nextMetroField = await page.$x('//*[@id="root"]/div/div[2]/div[2]/div[4]/div/div[2]/ul/li['+i+']'); //тут хитрость. Чтобы корректно выбрать станцию, мы обращаемся к ней через xpath локатор. в каждом последующей станции атрибут "data-index" увеличивается на 1. в нашем случае это элемент li
-        await nextMetroField[0].click(); // кликаем на станцию
+        await page.waitForSelector(`li.select-search__row[data-index="${i}"]`); // ожидаем подгрузки выпадающего списка
+        const nextMetroField = await page.$(`li.select-search__row[data-index="${i}"]`); //тут хитрость.В каждом последующем локаторе атрибут "data-index" увеличивается на 1, ровно как переменная-счетчик!
+        // проверка на последнюю станцию. Если в DOM нет следующего элемента(станции метро), мы получаем false, что и является выходом из цикла
+        let scriptBreaker = await page.evaluate((i) => 
+            !!document.querySelector(`li.select-search__row[data-index="${i+1}"]`), i); 
+        await nextMetroField.click(); // кликаем на станцию
 
         // тут следует сложный момент, который я подглядел на stackowerflow и переделал под этот кейс. page.$$ возвращает все элементы по селектору в массиве. Массив мы перебираем в цикле и достаем значение атрибута value, в нем записано название выбранной станции
         let nameOfStation = []; 
@@ -130,11 +141,11 @@ async function testScooterResult() {
             console.log(`Вместо ${nameOfStation} отобразилась ${result}`);
         } else {
             console.log("Станция метро "+ nameOfStation +" не отображается");
-            await page.screenshot({path: `Итерация-${i}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`}); // если станция не отображается делаем скриншот
+            await page.screenshot({path: `Итерация-${i+1}_номер_заказа-${orderNumber}_название_станции-${nameOfStation}.png`}); // если станция не отображается делаем скриншот
             await notDisplayed.push(nameOfStation); // дополнительно пишем в массив станции которые не отобразились 
         }
         // условием выхода из цикла являяется проверка последней станции
-        if (nameOfStation == 'Лихоборы') {
+        if (!scriptBreaker) {
             break;
         }
     }
